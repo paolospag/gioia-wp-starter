@@ -1,0 +1,21 @@
+/*!
+Theme Name: %THEME_NAME%
+Theme URI: %THEME_URI%
+Author: Marcosh.net
+Author URI: https://www.marcosh.net
+Description: A lightweight WordPress starter theme, based on Bootstrap-grid and ready to be developed.
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: LICENSE
+Text Domain: %DOMAIN_NAME%
+Tags: mobile-first, responsive-design, translation-ready, custom-logo, custom-menu, custom-fields, custom-types, custom-taxonomies, featured-images
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+
+%THEME_NAME% is based on Underscores https://underscores.me/, (C) 2012-2017 Automattic, Inc.
+*/
+
+/**
+ * Custom CSS here
+ */
