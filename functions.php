@@ -87,6 +87,20 @@ endif;
 add_action('after_setup_theme', '%DOMAIN_NAME%_setup');
 
 /**
+ * Add theme support for wp_body_open as
+ * required from WordPress newer than 5.2.
+ * Shim for WordPress older than 5.2.
+ *
+ * @link https://core.trac.wordpress.org/ticket/12563
+ * @since 5.2.0
+ */
+if ( !function_exists('wp_body_open') ):
+  function wp_body_open() {
+    do_action('wp_body_open');
+  }
+endif;
+
+/**
  * Register widget area.
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
