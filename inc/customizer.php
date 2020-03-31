@@ -12,29 +12,29 @@
  */
 function %DOMAIN_NAME%_customize_register($wp_customize) {
   $wp_customize->get_setting('blogname')->transport = 'postMessage';
-	$wp_customize->get_setting('blogdescription')->transport = 'postMessage';
-	$wp_customize->get_setting('header_textcolor')->transport = 'postMessage';
+  $wp_customize->get_setting('blogdescription')->transport = 'postMessage';
+  $wp_customize->get_setting('header_textcolor')->transport = 'postMessage';
   if ( isset($wp_customize->selective_refresh) ) {
     $wp_customize->selective_refresh->add_partial('blogname', array(
-			'selector'        => '.site-title a',
-			'render_callback' => '%DOMAIN_NAME%_customize_partial_blogname',
-		));
+      'selector'        => '.site-title a',
+      'render_callback' => '%DOMAIN_NAME%_customize_partial_blogname',
+    ));
     $wp_customize->selective_refresh->add_partial('blogdescription', array(
-			'selector'        => '.site-description',
-			'render_callback' => '%DOMAIN_NAME%_customize_partial_blogdescription',
-		));
+      'selector'        => '.site-description',
+      'render_callback' => '%DOMAIN_NAME%_customize_partial_blogdescription',
+    ));
   }
 }
 add_action('customize_register', '%DOMAIN_NAME%_customize_register');
 
 // Render the site title for the selective refresh partial.
 function %DOMAIN_NAME%_customize_partial_blogname() {
-	bloginfo('name');
+  bloginfo('name');
 }
 
 // Render the site tagline for the selective refresh partial.
 function %DOMAIN_NAME%_customize_partial_blogdescription() {
-	bloginfo('description');
+  bloginfo('description');
 }
 
 /**
@@ -45,6 +45,6 @@ function %DOMAIN_NAME%_customize_partial_blogdescription() {
 
 // Binds JS handlers to make Theme Customizer preview reload changes asynchronously.
 function %DOMAIN_NAME%_customize_preview_scripts() {
-	wp_enqueue_script( '%DOMAIN_NAME%-customizer', get_template_directory_uri() .'/js/customizer.js', array('customize-preview'), date('Ymd'), true );
+  wp_enqueue_script( '%DOMAIN_NAME%-customizer', get_template_directory_uri() .'/js/customizer.js', array('customize-preview'), date('Ymd'), true );
 }
 add_action('customize_preview_init', '%DOMAIN_NAME%_customize_preview_scripts');

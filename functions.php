@@ -22,15 +22,15 @@ if ( !function_exists('%DOMAIN_NAME%_setup') ):
     // Let WordPress manage the document title to avoid hard-coded <title> tag.
     add_theme_support('title-tag');
     // Add default posts and comments RSS feed links to head.
-  	add_theme_support('automatic-feed-links');
+    add_theme_support('automatic-feed-links');
     // Enable support for post thumbnails on posts and pages.
     add_theme_support('post-thumbnails');
     // Adding support for excerpt in page.
     add_post_type_support('page', 'excerpt');
     // Register theme nav menus.
     register_nav_menus( array(
-			'main-menu' => esc_html__('Menu principale', '%DOMAIN_NAME%'),
-		) );
+      'main-menu' => esc_html__('Menu principale', '%DOMAIN_NAME%'),
+    ) );
     // Switch default core markup to output valid HTML5.
     add_theme_support('html5', array(
   		'search-form',
@@ -40,23 +40,23 @@ if ( !function_exists('%DOMAIN_NAME%_setup') ):
   		'caption',
   	) );
     // Set up the WordPress core custom background feature.
-		add_theme_support('custom-background', apply_filters('%DOMAIN_NAME%_custom_background_args', array(
-			'default-color' => 'ffffff',
-			'default-image' => '',
-		) ));
+    add_theme_support('custom-background', apply_filters('%DOMAIN_NAME%_custom_background_args', array(
+      'default-color' => 'ffffff',
+      'default-image' => '',
+    ) ));
     // Add theme support for selective refresh for widgets.
-		add_theme_support('customize-selective-refresh-widgets');
+    add_theme_support('customize-selective-refresh-widgets');
     /**
-		 * Add support for core custom logo.
-		 *
-		 * @link https://codex.wordpress.org/Theme_Logo
-		 */
+     * Add support for core custom logo.
+     *
+     * @link https://codex.wordpress.org/Theme_Logo
+     */
     add_theme_support('custom-logo', array(
-			'height'      => 180,
-			'width'       => 74,
-			'flex-width'  => true,
-			'flex-height' => true,
-		) );
+      'height'      => 180,
+      'width'       => 74,
+      'flex-width'  => true,
+      'flex-height' => true,
+    ) );
     /**
      * Add and enable custom image sizes.
      * Uncomment or copy example below.
@@ -92,24 +92,24 @@ add_action('after_setup_theme', '%DOMAIN_NAME%_setup');
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
 function %DOMAIN_NAME%_widgets_init() {
-	register_sidebar( array(
-		'name'          => esc_html__('Sidebar', '%DOMAIN_NAME%'),
-		'id'            => 'sidebar',
-		'description'   => esc_html__('Aggiungi widget qui.', '%DOMAIN_NAME%'),
-		'before_widget' => '<div id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</div>',
-		'before_title'  => '<h5 class="widget-title">',
-		'after_title'   => '</h5>',
-	) );
   register_sidebar( array(
-		'name'          => esc_html__('Footer #1', '%DOMAIN_NAME%'),
-		'id'            => 'footer-1',
-		'description'   => esc_html__('Aggiungi widget qui.', '%DOMAIN_NAME%'),
-		'before_widget' => '<div id="%1$s" class="fwidget %2$s">',
-		'after_widget'  => '</div>',
-		'before_title'  => '<h6 class="fwidget-title">',
-		'after_title'   => '</h6>',
-	) );
+    'name'          => esc_html__('Sidebar', '%DOMAIN_NAME%'),
+    'id'            => 'sidebar',
+    'description'   => esc_html__('Aggiungi widget qui.', '%DOMAIN_NAME%'),
+    'before_widget' => '<div id="%1$s" class="widget %2$s">',
+    'after_widget'  => '</div>',
+    'before_title'  => '<h5 class="widget-title">',
+    'after_title'   => '</h5>',
+  ) );
+  register_sidebar( array(
+    'name'          => esc_html__('Footer #1', '%DOMAIN_NAME%'),
+    'id'            => 'footer-1',
+    'description'   => esc_html__('Aggiungi widget qui.', '%DOMAIN_NAME%'),
+    'before_widget' => '<div id="%1$s" class="fwidget %2$s">',
+    'after_widget'  => '</div>',
+    'before_title'  => '<h6 class="fwidget-title">',
+    'after_title'   => '</h6>',
+  ) );
 }
 add_action('widgets_init', '%DOMAIN_NAME%_widgets_init');
 
@@ -129,7 +129,7 @@ function %DOMAIN_NAME%_scripts() {
   if (is_admin_bar_showing()) {
     wp_add_inline_style( '%DOMAIN_NAME%-theme', gwp_create_admin_styles() );
   }
-	wp_enqueue_style( '%DOMAIN_NAME%-style', get_stylesheet_uri() );
+  wp_enqueue_style( '%DOMAIN_NAME%-style', get_stylesheet_uri() );
 
   // Scripts
   if ($is_IE) {
@@ -140,16 +140,16 @@ function %DOMAIN_NAME%_scripts() {
   wp_register_script( '%DOMAIN_NAME%-theme-scripts', get_template_directory_uri() .'/assets/js/main.js', array(), '1.0.0', true );
   wp_localize_script( '%DOMAIN_NAME%-theme-scripts', '%DOMAIN_NAME%_utils', array(
     'url' => esc_url(home_url()),
-		'ajax_url' => esc_url(site_url().'/wp-admin/admin-ajax.php'),
+    'ajax_url' => esc_url(site_url().'/wp-admin/admin-ajax.php'),
     /**
      * Other JavaScript utils here...
      * @link https://rudrastyh.com/wordpress/load-more-posts-ajax.html
      */
 	) );
   wp_enqueue_script( '%DOMAIN_NAME%-theme-scripts' );
-	if ( is_singular() && comments_open() && get_option('thread_comments') ) {
-		wp_enqueue_script( 'comment-reply' );
-	}
+  if ( is_singular() && comments_open() && get_option('thread_comments') ) {
+    wp_enqueue_script( 'comment-reply' );
+  }
 }
 add_action('wp_enqueue_scripts', '%DOMAIN_NAME%_scripts');
 
@@ -160,23 +160,23 @@ add_action('wp_enqueue_scripts', '%DOMAIN_NAME%_scripts');
  * @return array
  */
 function %DOMAIN_NAME%_body_classes($classes) {
-	// Adds a class of hfeed to non-singular pages.
-	if ( !is_singular() ) {
-		$classes[] = 'hfeed';
-	}
+  // Adds a class of hfeed to non-singular pages.
+  if ( !is_singular() ) {
+    $classes[] = 'hfeed';
+  }
   // Adds a class when there is no sidebar present.
-	if ( !is_active_sidebar('sidebar') ) {
-		$classes[] = 'no-sidebar';
-	}
-	return $classes;
+  if ( !is_active_sidebar('sidebar') ) {
+    $classes[] = 'no-sidebar';
+  }
+  return $classes;
 }
 add_filter('body_class', '%DOMAIN_NAME%_body_classes');
 
 // Add a pingback url auto-discovery header for single posts, pages, or attachments.
 function %DOMAIN_NAME%_pingback_header() {
-	if ( is_singular() && pings_open() ) {
-		printf('<link rel="pingback" href="%s">', esc_url( get_bloginfo('pingback_url') ));
-	}
+  if ( is_singular() && pings_open() ) {
+    printf('<link rel="pingback" href="%s">', esc_url( get_bloginfo('pingback_url') ));
+  }
 }
 add_action('wp_head', '%DOMAIN_NAME%_pingback_header');
 
@@ -208,7 +208,7 @@ add_filter('excerpt_more', '%DOMAIN_NAME%_custom_excerpt_more');
 
 // Stop WordPress wrapping images in a <p> tag
 function %DOMAIN_NAME%_remove_ptags_on_image($content) {
-	return preg_replace('/<p>(\s*)(<img .* \/>)(\s*)<\/p>/iU', '\2', $content);
+  return preg_replace('/<p>(\s*)(<img .* \/>)(\s*)<\/p>/iU', '\2', $content);
 }
 add_filter('the_content', '%DOMAIN_NAME%_remove_ptags_on_image');
 

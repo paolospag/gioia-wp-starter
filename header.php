@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" href="<?= get_template_directory_uri() ?>/assets/img/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="<?= get_template_directory_uri() ?>/assets/img/favicon-96x96.png" sizes="96x96"> -->
 
-	<?php wp_head(); ?>
+  <?php wp_head(); ?>
 
 </head>
 <body <?php body_class(); ?>>

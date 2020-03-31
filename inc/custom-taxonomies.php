@@ -2,12 +2,12 @@
 
 function %DOMAIN_NAME%_register_custom_taxonomies() {
 
-	/**
-	 * Add custom taxonomies here.
-	 *
-	 * @link https://generatewp.com/taxonomy/
-	 * @link https://developer.wordpress.org/reference/functions/register_taxonomy/
-	 */
+  /**
+   * Add custom taxonomies here.
+   *
+   * @link https://generatewp.com/taxonomy/
+   * @link https://developer.wordpress.org/reference/functions/register_taxonomy/
+   */
 
 }
 
