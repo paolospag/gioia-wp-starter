@@ -146,6 +146,7 @@ function %DOMAIN_NAME%_scripts() {
   wp_enqueue_style( '%DOMAIN_NAME%-style', get_stylesheet_uri() );
 
   // Scripts
+  wp_enqueue_script( 'jquery' );
   if ($is_IE) {
     wp_enqueue_script( 'object-fill-polyfill', get_template_directory_uri() .'/assets/js/object-fit.polyfill.js', array(), '2.3.4', true );
     wp_enqueue_script( 'css-vars-ponyfill', get_template_directory_uri() .'/assets/js/css-vars.ponyfill.js', array(), '2.1.2', true );
