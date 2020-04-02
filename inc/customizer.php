@@ -45,6 +45,6 @@ function %DOMAIN_NAME%_customize_partial_blogdescription() {
 
 // Binds JS handlers to make Theme Customizer preview reload changes asynchronously.
 function %DOMAIN_NAME%_customize_preview_scripts() {
-  wp_enqueue_script( '%DOMAIN_NAME%-customizer', get_template_directory_uri() .'/js/customizer.js', array('customize-preview'), date('Ymd'), true );
+  wp_enqueue_script( '%DOMAIN_NAME%-customizer', get_template_directory_uri() .'/assets/js/customizer.js', array('customize-preview'), date('Ymd'), true );
 }
 add_action('customize_preview_init', '%DOMAIN_NAME%_customize_preview_scripts');
