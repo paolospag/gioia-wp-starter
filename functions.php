@@ -47,8 +47,8 @@ if ( !function_exists('%DOMAIN_NAME%_setup') ):
      * @link https://codex.wordpress.org/Theme_Logo
      */
     add_theme_support('custom-logo', array(
-      'height'      => 180,
-      'width'       => 74,
+      'height'      => 250,
+      'width'       => 250,
       'flex-width'  => true,
       'flex-height' => true,
     ) );
