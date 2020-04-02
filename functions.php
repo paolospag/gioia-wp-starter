@@ -141,7 +141,7 @@ function %DOMAIN_NAME%_scripts() {
   // https://developer.wordpress.org/reference/functions/wp_add_inline_style/#user-contributed-notes
   wp_add_inline_style( '%DOMAIN_NAME%-theme', gwp_create_root_styles() );
   if (is_admin_bar_showing()) {
-    wp_add_inline_style( '%DOMAIN_NAME%-theme', gwp_create_admin_styles() );
+    wp_add_inline_style( 'admin-bar', gwp_create_admin_styles() );
   }
   wp_enqueue_style( '%DOMAIN_NAME%-style', get_stylesheet_uri() );
 
