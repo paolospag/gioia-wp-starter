@@ -46,7 +46,7 @@ function gwp_create_root_styles() {
 
 function gwp_placeholder_thumbnail() {
   $placeholder_src = get_template_directory_uri() .'/assets/img/post-placeholder.jpg';
-  $placeholder_alt = __('Immagine segnaposto', '%DOMAIN_NAME');
+  $placeholder_alt = __('Immagine segnaposto', '%DOMAIN_NAME%');
   echo '<img src="'. $placeholder_src .'" alt="'. $placeholder_alt .'" />';
 }
 
