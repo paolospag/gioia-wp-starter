@@ -63,6 +63,17 @@ ol, ul {
   padding: 0;
   list-style: none;
 }
+.site-logo,
+.site-title {
+  margin: 0;
+}
+.site-logo {
+  font-size: inherit;
+  line-height: 1;
+}
+.site-title {
+  font-size: 2.4rem;
+}
 .lang-menu {
   display: inline-block;
   position: relative;
@@ -126,6 +137,17 @@ ol, ul {
 .lang-menu__dropdown > li > a:hover,
 .lang-menu__dropdown > li > a:focus {
   text-decoration: none;
+}
+.social-bar > li {
+  display: inline-block;
+}
+.social-bar > li > a,
+.social-bar > li > a:hover,
+.social-bar > li > a:focus {
+  text-decoration: none;
+}
+.social-bar > li + li {
+  margin-left: 7.5px;
 }
 .not-found {
   text-align: center;
@@ -369,4 +391,27 @@ span.wpcf7-not-valid-tip {
   position: absolute;
   bottom: -14px;
   left: 0;
+}
+
+/* Icons */
+.icon {
+  display: inline-block;
+  font-size: inherit;
+  font-style: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-facebook {
+  margin-right: -6px;
+  margin-left: -2px;
+}
+.icon > svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--secondary-color);
+  transition: fill 0.2s ease;
+}
+a:hover .icon > svg {
+  fill: var(--primary-color);
 }
