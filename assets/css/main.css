@@ -12,7 +12,7 @@
 body {
   font-size: 1rem;
   line-height: 1.4;
-  /* TODO: set font family */
+  /* %CSS_FONT_FAMILY% */
 }
 body.no-scroll {
   overflow-y: hidden;
@@ -414,4 +414,15 @@ span.wpcf7-not-valid-tip {
 }
 a:hover .icon > svg {
   fill: var(--primary-color);
+}
+
+/* Supports */
+@supports not (object-fit: cover) {
+  /**
+   * TODO: add supports
+   * @example: img { font-family: 'object-fit: cover; object-position: center;'; }
+   */
+}
+@supports not (mix-blend-mode: multiply) {
+  /* TODO: add supports */
 }
