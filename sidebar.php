@@ -1,8 +1,8 @@
 <?php
 /**
- * The theme sidebar
+ * The theme sidebar.
  *
- * It contains widgets or complementary content
+ * It contains widgets or complementary content.
  *
  * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
  *

@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying all pages.
+ * The template for displaying page.
  *
  * This is the template that displays all pages by default.
  *
