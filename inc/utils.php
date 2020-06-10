@@ -1,6 +1,6 @@
 <?php
 /**
- * %THEME_NAME% Theme utils
+ * %THEME_NAME% Theme utils.
  *
  * @package %DOMAIN_NAME%
  */
@@ -38,52 +38,54 @@ function gwp_create_root_styles() {
   $color_scheme = gwp_color_scheme();
   $root_styles = ':root {';
   foreach($color_scheme as $name => $value) {
-    $hex_color = get_theme_mod($name, $value['color']);
-    $root_styles .= '--'.str_replace('_', '-', $name).': '.$hex_color.';';
-    if (strpos($name, 'primary') !== false || strpos($name, 'secondary') !== false) {
-      $root_styles .= '--'.str_replace('_', '-', $name).'-dark: '.gwp_color_brightness($hex_color, -0.133).';';
-      $root_styles .= '--'.str_replace('_', '-', $name).'-light: '.gwp_color_brightness($hex_color, 0.097).';';
+    $option_name = $name.'_color';
+    $slug_color = str_replace('_', '-', $name);
+    $hex_color = get_theme_mod($option_name, $value['color']);
+    $root_styles .= '--'.$slug_color.'-color: '.$hex_color.';';
+    if ($name === 'primary' || $name === 'secondary') {
+      $root_styles .= '--'.$slug_color.'-dark-color: '.gwp_color_brightness($hex_color, -0.133).';';
+      $root_styles .= '--'.$slug_color.'-light-color: '.gwp_color_brightness($hex_color, 0.296).';';
     }
   }
   $root_styles .= '}';
   return $root_styles;
 }
 
-function gwp_placeholder_thumbnail() {
-  $placeholder_src = get_template_directory_uri() .'/assets/img/post-placeholder.jpg';
+function gwp_placeholder_thumbnail($type = 'post') {
   $placeholder_alt = __('Immagine segnaposto', '%DOMAIN_NAME%');
-  echo '<img src="'. $placeholder_src .'" alt="'. $placeholder_alt .'" />';
+  $placeholder_src = get_template_directory_uri().'/assets/img/'.$type.'-placeholder.jpg';
+  echo '<img src="'. esc_url($placeholder_src) .'" alt="'. esc_attr($placeholder_alt) .'" />';
 }
 
 function gwp_color_scheme() {
   $color_scheme = array(
-    'primary_color' => array(
+    'primary' => array(
       'color' => '#e64e28',
-      'label' => 'Colore primario'
+      'label' => 'Primario'
     ),
-    'secondary_color' => array(
+    'secondary' => array(
       'color' => '#2f2c60',
-      'label' => 'Colore secondario'
+      'label' => 'Secondario'
     ),
-    'light_color' => array(
+    'light' => array(
       'color' => '#f2f2f2',
-      'label' => 'Colore chiaro'
+      'label' => 'Chiaro'
     ),
-    'border_color' => array(
+    'border' => array(
       'color' => '#dfe5e8',
-      'label' => 'Colore bordo'
+      'label' => 'Bordo'
     ),
-    'text_color' => array(
+    'text' => array(
       'color' => '#212121',
-      'label' => 'Colore del testo'
+      'label' => 'Testo'
     ),
-    'text_light_color' => array(
+    'text_light' => array(
       'color' => '#5f717f',
-      'label' => 'Colore chiaro del testo'
+      'label' => 'Testo (chiaro)'
     ),
-    'white_color' => array(
+    'white' => array(
       'color' => '#ffffff',
-      'label' => 'Colore bianco'
+      'label' => 'Bianco'
     ),
   );
   return $color_scheme;
@@ -106,26 +108,11 @@ function gwp_color_brightness($hex, $percent) {
 
 function gwp_social_networks() {
   $social_networks = array(
-    'facebook' => array(
-      'url' => '',
-      'label' => 'Facebook'
-    ),
-    'instagram' => array(
-      'url' => '',
-      'label' => 'Instagram'
-    ),
-    'youtube' => array(
-      'url' => '',
-      'label' => 'YouTube'
-    ),
-    'twitter' => array(
-      'url' => '',
-      'label' => 'Twitter'
-    ),
-    'linkedin' => array(
-      'url' => '',
-      'label' => 'LinkedIn'
-    ),
+    'facebook' => 'Facebook',
+    'twitter' => 'Twitter',
+    'linkedin' => 'LinkedIn',
+    'instagram' => 'Instagram',
+    'youtube' => 'YouTube',
   );
   return $social_networks;
 }
@@ -145,11 +132,20 @@ function gwp_svg_icon($name) {
     case 'linkedin':
       $svg = '<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z"/></svg>';
       break;
+    case 'linkedin-s':
+      $svg = '<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M365 1414h231v-694h-231v694zm246-908q-1-52-36-86t-93-34-94.5 34-36.5 86q0 51 35.5 85.5t92.5 34.5h1q59 0 95-34.5t36-85.5zm585 908h231v-398q0-154-73-233t-193-79q-136 0-209 117h2v-101h-231q3 66 0 694h231v-388q0-38 7-56 15-35 45-59.5t74-24.5q116 0 116 157v371zm468-998v960q0 119-84.5 203.5t-203.5 84.5h-960q-119 0-203.5-84.5t-84.5-203.5v-960q0-119 84.5-203.5t203.5-84.5h960q119 0 203.5 84.5t84.5 203.5z"/></svg>';
+      break;
     case 'twitter':
       $svg = '<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg>';
       break;
+    case 'whatsapp':
+      $svg = '<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1113 974q13 0 97.5 44t89.5 53q2 5 2 15 0 33-17 76-16 39-71 65.5t-102 26.5q-57 0-190-62-98-45-170-118t-148-185q-72-107-71-194v-8q3-91 74-158 24-22 52-22 6 0 18 1.5t19 1.5q19 0 26.5 6.5t15.5 27.5q8 20 33 88t25 75q0 21-34.5 57.5t-34.5 46.5q0 7 5 15 34 73 102 137 56 53 151 101 12 7 22 7 15 0 54-48.5t52-48.5zm-203 530q127 0 243.5-50t200.5-134 134-200.5 50-243.5-50-243.5-134-200.5-200.5-134-243.5-50-243.5 50-200.5 134-134 200.5-50 243.5q0 203 120 368l-79 233 242-77q158 104 345 104zm0-1382q153 0 292.5 60t240.5 161 161 240.5 60 292.5-60 292.5-161 240.5-240.5 161-292.5 60q-195 0-365-94l-417 134 136-405q-108-178-108-389 0-153 60-292.5t161-240.5 240.5-161 292.5-60z"/></svg>';
+      break;
     case 'spinner':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      break;
+    case 'search':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
       break;
     case 'phone':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
@@ -160,11 +156,8 @@ function gwp_svg_icon($name) {
     case 'email':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
-    case 'plus':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
-      break;
-    case 'minus':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 13H5v-2h14v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+    case 'address':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none"/><path d="M8.17 5.7L1 10.48V21h5v-8h4v8h5V10.25z"/><path d="M17 7h2v2h-2z" fill="none"/><path d="M10 3v1.51l2 1.33L13.73 7H15v.85l2 1.34V11h2v2h-2v2h2v2h-2v4h6V3H10zm9 6h-2V7h2v2z"/></svg>';
       break;
     case 'place':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
@@ -178,17 +171,29 @@ function gwp_svg_icon($name) {
     case 'download':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>';
       break;
+    case 'dismiss':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      break;
+    case 'clock':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M0 0h24v24H0z" fill="none"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>';
+      break;
+    case 'lock':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>';
+      break;
+    case 'cart':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      break;
+    case 'plus':
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      break;
     case 'right':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'left':
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
-    case 'lock':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>';
-      break;
     default:
       $svg = '';
   }
-  return $svg;
+  return '<i class="icon icon-'.$name.'" aria-hidden="true">'.$svg.'</i>';
 }

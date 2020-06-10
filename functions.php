@@ -1,6 +1,6 @@
 <?php
 /**
- * %THEME_NAME% Theme functions and definitions
+ * %THEME_NAME% Theme functions and definitions.
  *
  * @link https://developer.wordpress.org/themes/basics/theme-functions/
  *
@@ -29,7 +29,7 @@ if ( !function_exists('%DOMAIN_NAME%_setup') ):
     add_post_type_support('page', 'excerpt');
     // Register theme nav menus.
     register_nav_menus( array(
-      'main-menu' => esc_html__('Menu principale', '%DOMAIN_NAME%'),
+      'primary' => esc_html__('Menu principale', '%DOMAIN_NAME%'),
     ) );
     // Switch default core markup to output valid HTML5.
     add_theme_support('html5', array(
@@ -133,7 +133,6 @@ function %DOMAIN_NAME%_scripts() {
   wp_enqueue_style( 'google-fonts', '%GOOGLE_FONTS%', NULL, NULL, 'all' );
   wp_enqueue_style( 'bootstrap-base', get_template_directory_uri() .'/assets/css/bootstrap-base.min.css', NULL, '4.4.1', 'all' );
   wp_enqueue_style( '%DOMAIN_NAME%-theme', get_template_directory_uri() .'/assets/css/main.css', NULL, '1.0.0', 'all' );
-  // https://developer.wordpress.org/reference/functions/wp_add_inline_style/#user-contributed-notes
   wp_add_inline_style( '%DOMAIN_NAME%-theme', gwp_create_root_styles() );
   if (is_admin_bar_showing()) {
     wp_add_inline_style( 'admin-bar', gwp_create_admin_styles() );
@@ -146,21 +145,52 @@ function %DOMAIN_NAME%_scripts() {
     wp_enqueue_script( 'object-fit-polyfill', get_template_directory_uri() .'/assets/js/object-fit.polyfill.js', array(), '3.2.4', true );
     wp_enqueue_script( 'css-vars-ponyfill', get_template_directory_uri() .'/assets/js/css-vars.ponyfill.js', array(), '2.2.1', true );
   }
-  wp_register_script( '%DOMAIN_NAME%-theme-scripts', get_template_directory_uri() .'/assets/js/main.js', array(), '1.0.0', true );
-  wp_localize_script( '%DOMAIN_NAME%-theme-scripts', '%DOMAIN_NAME%_utils', array(
+  if ( class_exists('ACF') && $google_map_api_key = acf_get_setting('google_api_key') ) {
+    wp_enqueue_script( 'google-maps', 'https://maps.googleapis.com/maps/api/js?key='.$google_map_api_key, array(), '3', true );
+  }
+  wp_register_script( '%DOMAIN_NAME%-theme-js', get_template_directory_uri() .'/assets/js/main.js', array(), '1.0.0', true );
+  wp_localize_script( '%DOMAIN_NAME%-theme-js', '%DOMAIN_NAME%_utils', array(
     'url' => esc_url(home_url()),
     'ajax_url' => esc_url(site_url().'/wp-admin/admin-ajax.php'),
+    'loading' => esc_attr__('Caricamento&hellip;', '%DOMAIN_NAME%')
     /**
      * Other JavaScript utils here...
      * @link https://rudrastyh.com/wordpress/load-more-posts-ajax.html
      */
 	) );
-  wp_enqueue_script( '%DOMAIN_NAME%-theme-scripts' );
+  wp_enqueue_script( '%DOMAIN_NAME%-theme-js' );
   if ( is_singular() && comments_open() && get_option('thread_comments') ) {
     wp_enqueue_script( 'comment-reply' );
   }
 }
 add_action('wp_enqueue_scripts', '%DOMAIN_NAME%_scripts');
+
+/**
+ * Add theme color meta tag.
+ *
+ * @return void
+ */
+function %DOMAIN_NAME%_theme_color_meta() {
+  $default_color = gwp_color_scheme()['primary']['color'];
+  $theme_color = get_theme_mod('primary_color', $default_color);
+  echo '<meta name="theme-color" content="'. esc_attr($theme_color) .'" />';
+}
+add_action('wp_head', '%DOMAIN_NAME%_theme_color_meta', 20);
+
+/**
+ * Add theme favicon link,
+ * to support some older browsers.
+ *
+ * @return void
+ */
+function %DOMAIN_NAME%_favicon_link() {
+  $default_icon = get_site_icon_url();
+  $favicon_path = get_stylesheet_directory().'/favicon.ico';
+  if ( !empty($default_icon) && file_exists($favicon_path) ) {
+    echo '<link rel="shortcut icon" href="'.get_stylesheet_directory_uri().'/favicon.ico" />';
+  }
+}
+add_action('wp_head', '%DOMAIN_NAME%_favicon_link', 100);
 
 /**
  * Add custom classes to the array of body classes.
@@ -189,14 +219,15 @@ function %DOMAIN_NAME%_pingback_header() {
 }
 add_action('wp_head', '%DOMAIN_NAME%_pingback_header');
 
-// Handle default query targeting specific pages.
+/**
+ * Handle default query targeting specific pages.
+ * Replace TODO with customizations...
+ *
+ * @link https://developer.wordpress.org/reference/hooks/pre_get_posts/
+ */
 function %DOMAIN_NAME%_query_handler($query) {
   if ( !is_admin() && $query->is_main_query() ) {
-    /**
-     * Customizations here...
-     *
-     * @link https://developer.wordpress.org/reference/hooks/pre_get_posts/
-     */
+    // TODO
   }
 }
 add_action('pre_get_posts', '%DOMAIN_NAME%_query_handler');
@@ -215,18 +246,30 @@ function %DOMAIN_NAME%_custom_excerpt_more($more) {
 }
 add_filter('excerpt_more', '%DOMAIN_NAME%_custom_excerpt_more');
 
-// Stop WordPress wrapping images in a <p> tag
+// Stop WordPress wrapping images in a <p> tag.
 function %DOMAIN_NAME%_remove_ptags_on_image($content) {
   return preg_replace('/<p>(\s*)(<img .* \/>)(\s*)<\/p>/iU', '\2', $content);
 }
 add_filter('the_content', '%DOMAIN_NAME%_remove_ptags_on_image');
+add_filter('widget_text_content', '%DOMAIN_NAME%_remove_ptags_on_image');
 
 /**
  * Contact Form 7 integrations.
  */
 if ( class_exists('WPCF7') ) {
-  // Stop wrap form control into <p> tag
+  // Stop wrap form control into <p> tag.
   add_filter('wpcf7_autop_or_not', '__return_false');
+}
+
+/**
+ * Yoast SEO integrations.
+ */
+if ( class_exists('WPSEO_Options') ) {
+  // Wrap breadcrumbs in styleable list.
+  function %DOMAIN_NAME%_yoast_breadcrumb_separator() {
+    return '</li><li>';
+  }
+  add_filter('wpseo_breadcrumb_separator', '%DOMAIN_NAME%_yoast_breadcrumb_separator', 10);
 }
 
 /**
@@ -238,6 +281,11 @@ require get_template_directory() .'/inc/custom-header.php';
  * Implement customizer additions.
  */
 require get_template_directory() .'/inc/customizer.php';
+
+/**
+ * Load Theme custom widgets.
+ */
+require get_template_directory() .'/inc/custom-widgets.php';
 
 /**
  * Load custom post types and taxonomies.
