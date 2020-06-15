@@ -13,7 +13,7 @@ get_header();
 <div class="container">
   <?php
     /**
-     * Front-page contente here.
+     * Front-page content here.
      */
   ?>
 </div>

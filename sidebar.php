@@ -8,9 +8,8 @@
  *
  * @package %DOMAIN_NAME%
  */
-$classes = 'col-md-3 col-lg-3 offset-lg-1';
 ?>
-<aside id="sidebar" class="<?= $classes ?>">
+<aside id="sidebar" class="col-md-3 col-lg-3 offset-lg-1">
   <?php
     if( is_active_sidebar('sidebar') ) {
       dynamic_sidebar('sidebar');
