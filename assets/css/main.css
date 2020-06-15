@@ -26,7 +26,7 @@ body:after {
   bottom: 0;
   z-index: -1;
   height: 100%;
-  background-color: #000;
+  background-color: rgb(0,0,0);
   transition: opacity 0.2s ease;
 }
 body.overlay:after {
@@ -131,6 +131,35 @@ select::-ms-expand {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+.btn {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  display: inline-block;
+  padding: 0.6rem 1.4rem;
+  min-width: 170px;
+  font-size: inherit;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  background-image: none;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+.btn,
+.btn:hover,
+.btn:focus {
+  text-decoration: none;
+}
+.btn.disabled,
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 .badge {
   padding: 2px;
@@ -554,6 +583,11 @@ body.overlay .header__search {
 }
 
 /* Responsive */
+@media (max-width: 575px) {
+  .btn {
+    white-space: inherit;
+  }
+}
 @media (min-width: 576px) {
   .not-found__text {
     font-size: 172px;
