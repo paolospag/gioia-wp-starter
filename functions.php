@@ -283,7 +283,7 @@ require get_template_directory() .'/inc/custom-header.php';
 require get_template_directory() .'/inc/customizer.php';
 
 /**
- * Load Theme custom widgets.
+ * Load custom widgets.
  */
 require get_template_directory() .'/inc/custom-widgets.php';
 
