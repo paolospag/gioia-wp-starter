@@ -1,14 +1,13 @@
 <?php
+if ( !defined('ABSPATH') ) {
+  exit;
+}
+
 /**
  * %THEME_NAME% Theme Customizer.
  *
- * @package %DOMAIN_NAME%
- */
-
-/**
- * Add postMessage support for site title and description for the Theme Customizer.
- *
  * @param WP_Customize_Manager $wp_customize Theme Customizer object.
+ * @package %DOMAIN_NAME%
  */
 function %DOMAIN_NAME%_customize_register($wp_customize) {
   // Theme sanitize utils
@@ -181,12 +180,12 @@ function %DOMAIN_NAME%_customize_partial_colors() {
 
 // Render the footer copyright for the selective refresh partial.
 function %DOMAIN_NAME%_customize_partial_copyright() {
-  $copyright_text = get_theme_mod('copyright_text', '&copy; GWP');
+  $copyright_text = get_theme_mod('copyright_text', '&copy; GWP Theme');
   echo nl2br($copyright_text);
 }
 
 /**
- * Other partial renderds here.
+ * Other partial renders here.
  *
  * @link https://developer.wordpress.org/themes/customize-api/
  */

@@ -1,7 +1,10 @@
 <?php
+if ( !defined('ABSPATH') ) {
+  exit;
+}
 
 /**
- * Returns the translated object ID(post_type or term) or original if missing
+ * Returns the translated object ID (post_type or term) or original if missing
  *
  * @param $object_id integer|string|array The ID/s of the objects to check and return
  * @param $type the object type: post, page, {custom post type name}, nav_menu, nav_menu_item, category, tag etc.
@@ -30,16 +33,6 @@ function wpml_sync($object_id, $type) {
   } else {
     return apply_filters( 'wpml_object_id', $object_id, $type, true, $current_language );
   }
-}
-
-// Get original term slug
-function wpml_get_default_term($term_id, $taxonomy, $language) {
-  global $sitepress;
-  $default_term_id = apply_filters('wpml_object_id', $term_id, $taxonomy, TRUE, $language);
-  remove_filter('get_term', array($sitepress, 'get_term_adjust_id'), 1);
-  $default_term_obj = get_term_by('id', intval($default_term_id), $taxonomy);
-  add_filter('get_term', array($sitepress, 'get_term_adjust_id'), 1, 1);
-  return $default_term_obj;
 }
 
 // Render custom WPML language switcher

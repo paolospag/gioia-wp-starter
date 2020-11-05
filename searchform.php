@@ -4,7 +4,7 @@
  *
  * @package %DOMAIN_NAME%
  */
-$has_dismiss = get_query_var('has_dismiss', false);
+$has_dismiss = isset($args['has_dismiss']) && $args['has_dismiss'];
 ?>
 <form class="search-form" method="get" action="<?= home_url(); ?>" role="search">
   <label for="search" class="sr-only"><?= _x('Cerca per parole chiave', 'label', '%DOMAIN_NAME%'); ?></label>

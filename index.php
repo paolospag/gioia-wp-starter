@@ -15,11 +15,23 @@ get_header();
 
 <div class="container">
   <?php if( have_posts() ): ?>
-    <div class="posts-list" role="list">
+    <div class="posts-list">
+      <?php if( is_search() ): ?>
+        <h3><?php printf( esc_html__('Risultati di ricerca per: %s', '%DOMAIN_NAME%'), '<em>'.get_search_query().'</em>' ); ?></h3>
+      <?php endif; ?>
+      <div class="row" role="list">
+        <?php
+          while( have_posts() ): the_post();
+            get_template_part('template-parts/content');
+          endwhile;
+        ?>
+      </div>
       <?php
-        while( have_posts() ): the_post();
-          get_template_part('template-parts/content');
-        endwhile;
+        the_posts_pagination([
+          'type' => 'list',
+          'prev_text' => gwp_svg_icon('left'),
+          'next_text' => gwp_svg_icon('right')
+        ]);
       ?>
     </div>
   <?php else: ?>

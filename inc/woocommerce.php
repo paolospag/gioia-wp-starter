@@ -1,11 +1,7 @@
 <?php
-/**
- * WooCommerce Compatibility File.
- *
- * @link https://woocommerce.com/
- *
- * @package %DOMAIN_NAME%
- */
+if ( !defined('ABSPATH') ) {
+  exit;
+}
 
 /**
  * WooCommerce theme support & setup.
@@ -14,15 +10,15 @@
  * @link https://github.com/woocommerce/woocommerce/wiki/Enabling-product-gallery-features-(zoom,-swipe,-lightbox)
  */
 function %DOMAIN_NAME%_woocommerce_setup() {
-	add_theme_support('woocommerce');
+	// add_theme_support('woocommerce');
 	// add_theme_support('wc-product-gallery-zoom');
 	// add_theme_support('wc-product-gallery-lightbox');
-	add_theme_support('wc-product-gallery-slider');
+	// add_theme_support('wc-product-gallery-slider');
 }
 add_action('after_setup_theme', '%DOMAIN_NAME%_woocommerce_setup');
 
 /**
- * WooCommerce specific scripts & stylesheets.
+ * Enqueue WooCommerce scripts & styles.
  */
 function %DOMAIN_NAME%_woocommerce_scripts() {
 	wp_enqueue_style( '%DOMAIN_NAME%-woocommerce-style', get_template_directory_uri() .'/woocommerce.css' );
@@ -41,7 +37,7 @@ function %DOMAIN_NAME%_woocommerce_scripts() {
 }
 add_action('wp_enqueue_scripts', '%DOMAIN_NAME%_woocommerce_scripts');
 
-// Adds a class when it is a WooCommerce page.
+// Add body class if WooCommerce page is detected.
 function %DOMAIN_NAME%_woocommerce_body_classes($classes) {
 	if ( is_cart() || is_checkout() || is_woocommerce() ) {
 		$classes[] = 'is-woocommerce';
@@ -52,7 +48,7 @@ add_filter('body_class', '%DOMAIN_NAME%_woocommerce_body_classes');
 
 /**
  * Remove default WooCommerce wrapper,
- * then wraps the content in the theme markup.
+ * then wrap the content in theme markup.
  *
  * @return void
  */
@@ -73,6 +69,7 @@ add_action('woocommerce_after_main_content', '%DOMAIN_NAME%_woocommerce_wrapper_
 
 /**
  * Cart button.
+ *
  * Show a custom button to link the cart,
  * including the number of items present and the total.
  *
@@ -103,6 +100,7 @@ if ( !function_exists('%DOMAIN_NAME%_woocommerce_cart_button') ) {
 
 /**
  * Cart fragments.
+ *
  * Ensure cart contents update on AJAX operations/refresh.
  *
  * @param array $fragments

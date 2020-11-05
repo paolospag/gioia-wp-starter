@@ -35,30 +35,32 @@ $show_search_button = get_theme_mod('show_search_button', false);
 <body <?php body_class(); ?>>
   <?php wp_body_open(); ?>
   <header id="header">
-    <?php
-      /**
-       * Header content here.
-       *
-       * @example
-       * #header
-       * |__.header__main
-       *    |__.site-logo
-       *    |__.navbar
-       *       |__.navbar__nav
-       *       |__.navbar__cart
-       *       |__.navbar__search
-       * |__.header__search
-       *    |__.search-form
-       */
-    ?>
-    <div class="<?= esc_attr('site-'.has_custom_logo() ? 'logo' : 'title'); ?>">
-      <?php if( has_custom_logo() ): ?>
-        <?php the_custom_logo(); ?>
-      <?php else: ?>
-        <a href="<?= esc_url( home_url('/') ); ?>">
-          <?php bloginfo('name'); ?>
-        </a>
-      <?php endif; ?>
+    <div class="header__main">
+      <?php get_template_part('template-parts/partials/site', 'logo'); ?>
+      <nav class="navbar<?php if($show_search_button){echo ' navbar--search';} ?>">
+        <?php
+          wp_nav_menu([
+            // 'depth' => 2,
+            'container' => false,
+            'menu_id' => 'main-menu',
+            'menu_class' => 'navbar__nav',
+            'theme_location' => 'primary',
+            'fallback_cb' => '__return_false'
+          ]);
+          get_template_part('template-parts/partials/navbar', 'toggle');
+          if( $show_cart_button && function_exists('%DOMAIN_NAME%_woocommerce_cart_button') ) {
+            %DOMAIN_NAME%_woocommerce_cart_button();
+          }
+          if( $show_search_button ) {
+            get_template_part('template-parts/partials/navbar', 'search');
+          }
+        ?>
+      </nav>
     </div>
+    <?php if( $show_search_button ): ?>
+      <div class="header__search">
+        <?php get_search_form(['has_dismiss'=> true]); ?>
+      </div>
+    <?php endif; ?>
   </header>
   <main id="main-content">

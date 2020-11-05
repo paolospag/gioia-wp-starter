@@ -15,7 +15,7 @@ get_header();
     <h3 class="not-found__text">404</h3>
     <div class="not-found__desc">
       <p><?php _e('Sembra che ti sia perso.', '%DOMAIN_NAME%'); ?></p>
-      <a href="<?= esc_url(home_url('/')); ?>" class="btn"><?php _e('Torna alla home', '%DOMAIN_NAME%'); ?></a>
+      <a href="<?= esc_url(home_url('/')); ?>" class="btn btn-primary"><?php _e('Torna alla home', '%DOMAIN_NAME%'); ?></a>
     </div>
   </div>
 </div>

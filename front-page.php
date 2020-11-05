@@ -6,7 +6,6 @@
  *
  * @package %DOMAIN_NAME%
  */
-
 get_header();
 ?>
 

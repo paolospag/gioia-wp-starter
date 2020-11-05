@@ -1,19 +1,29 @@
-<div class="posts-list__item row" role="listitem">
-  <div class="col-sm-3">
-    <figure>
-      <?php
-        if( has_post_thumbnail() ):
-          the_post_thumbnail(null, 'medium');
-        else:
-          gwp_placeholder_thumbnail();
-        endif;
-      ?>
+<?php
+// Exit if accessed directly.
+defined('ABSPATH') || exit;
+?>
+
+<div class="posts-list__item col-md-6" role="listitem">
+  <div class="entry">
+    <figure class="entry__thumb">
+      <a href="<?= esc_url(get_permalink()); ?>">
+        <?php
+          has_post_thumbnail()
+            ? the_post_thumbnail('medium_large')
+            : gwp_placeholder_thumbnail();
+        ?>
+      </a>
     </figure>
-  </div>
-  <div class="col-sm-9">
-    <?php
-      the_title('<h3 class="post-title">', '</h3>');
-      the_excerpt();
-    ?>
+    <div class="entry__body">
+      <?php the_title('<h4>', '</h4><hr />'); ?>
+      <div class="wp-block-text">
+        <?php the_excerpt(); ?>
+      </div>
+      <div class="btn-container">
+        <a href="<?= esc_url(get_permalink()); ?>" class="btn btn-primary">
+          <span><?php _e('Leggi tutto', '%DOMAIN_NAME%'); ?></span>
+        </a>
+      </div>
+    </div>
   </div>
 </div>

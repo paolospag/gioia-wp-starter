@@ -8,6 +8,7 @@
  *
  * @package %DOMAIN_NAME%
  */
+$copyright_text = get_theme_mod('copyright_text', '&copy; GWP Theme');
 ?>
 
   </main><!-- #main-content -->
@@ -17,6 +18,9 @@
        * Footer content here.
        */
     ?>
+    <div class="text-center">
+      <p><?php echo nl2br($copyright_text); ?></p>
+    </div>
   </footer>
 
   <?php wp_footer(); ?>
