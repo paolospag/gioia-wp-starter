@@ -9,6 +9,9 @@ if ( !defined('ABSPATH') ) {
  * @package %DOMAIN_NAME%
  */
 
+define('GWP_DARK_BRIGHTNESS', -0.133);
+define('GWP_LIGHT_BRIGHTNESS', 0.296);
+
 function gwp_create_admin_styles() {
   $admin_styles = 'html {
     margin-bottom: 32px !important;
@@ -46,9 +49,9 @@ function gwp_create_root_styles() {
     $slug_color = str_replace('_', '-', $name);
     $hex_color = get_theme_mod($option_name, $value['color']);
     $root_styles .= '--'.$slug_color.'-color: '.$hex_color.';';
-    if ($name === 'primary' || $name === 'secondary') {
-      $root_styles .= '--'.$slug_color.'-dark-color: '.gwp_color_brightness($hex_color, -0.133).';';
-      $root_styles .= '--'.$slug_color.'-light-color: '.gwp_color_brightness($hex_color, 0.296).';';
+    if ( in_array($name, ['primary', 'secondary']) ) {
+      $root_styles .= '--'.$slug_color.'-dark-color: '.gwp_color_brightness($hex_color, GWP_DARK_BRIGHTNESS).';';
+      $root_styles .= '--'.$slug_color.'-light-color: '.gwp_color_brightness($hex_color, GWP_LIGHT_BRIGHTNESS).';';
     }
   }
   $root_styles .= '}';
@@ -56,41 +59,40 @@ function gwp_create_root_styles() {
 }
 
 function gwp_placeholder_thumbnail($type = 'post') {
-  $placeholder_alt = __('Immagine segnaposto', '%DOMAIN_NAME%');
   $placeholder_src = get_template_directory_uri() .'/assets/img/'.$type.'-placeholder.jpg';
-  echo '<img src="'. esc_url($placeholder_src) .'" alt="'. esc_attr($placeholder_alt) .'" />';
+  echo '<img src="'. esc_url($placeholder_src) .'" alt="'. esc_attr__('Immagine segnaposto', '%DOMAIN_NAME%') .'" />';
 }
 
 function gwp_color_scheme() {
   $color_scheme = array(
-    'primary' => array(
+    'primary' => [
       'color' => '#e64e28',
       'label' => 'Primario'
-    ),
-    'secondary' => array(
+    ],
+    'secondary' => [
       'color' => '#2f2c60',
       'label' => 'Secondario'
-    ),
-    'light' => array(
+    ],
+    'light' => [
       'color' => '#f2f2f2',
       'label' => 'Chiaro'
-    ),
-    'border' => array(
+    ],
+    'border' => [
       'color' => '#dfe5e8',
       'label' => 'Bordo'
-    ),
-    'text' => array(
+    ],
+    'text' => [
       'color' => '#212121',
       'label' => 'Testo'
-    ),
-    'text_light' => array(
+    ],
+    'text_light' => [
       'color' => '#5f717f',
       'label' => 'Testo chiaro'
-    ),
-    'white' => array(
+    ],
+    'white' => [
       'color' => '#ffffff',
       'label' => 'Bianco'
-    ),
+    ],
   );
   return $color_scheme;
 }
@@ -108,6 +110,55 @@ function gwp_color_brightness($hex, $percent) {
     $color = str_pad(dechex($color + $adjust_amount), 2, '0', STR_PAD_LEFT);
   }
   return '#'.implode($hex);
+}
+
+function gwp_create_block_color_palettes() {
+  $color_palettes = array();
+  $color_scheme = gwp_color_scheme();
+  foreach($color_scheme as $name => $value) {
+    $option_name = $name.'_color';
+    $slug_color = str_replace('_', '-', $name);
+    $hex_color = get_theme_mod($option_name, $value['color']);
+    if ( in_array($name, ['primary', 'secondary']) ) {
+      $light_hex_color = gwp_color_brightness($hex_color, GWP_LIGHT_BRIGHTNESS);
+      $color_palettes[] = array(
+        'color' => $light_hex_color,
+        'slug'  => $slug_color.'-light',
+        'name'  => __("$value[label] chiaro", '%DOMAIN_NAME%')
+      );
+    }
+    $color_palettes[] = array(
+      'color' => $hex_color,
+      'slug'  => $slug_color,
+      'name'  => __($value['label'], '%DOMAIN_NAME%')
+    );
+  }
+  return $color_palettes;
+}
+
+function gwp_create_block_font_sizes() {
+  return array(
+    [
+      'size' => 13,
+      'slug' => 'small',
+      'name' => __('Piccolo', '%DOMAIN_NAME%'),
+    ],
+    [
+      'size' => 18,
+      'slug' => 'medium',
+      'name' => __('Medio', '%DOMAIN_NAME%'),
+    ],
+    [
+      'size' => 24,
+      'slug' => 'large',
+      'name' => __('Grande', '%DOMAIN_NAME%'),
+    ],
+    [
+      'size' => 36,
+      'slug' => 'extra',
+      'name' => __('Extra', '%DOMAIN_NAME%'),
+    ],
+  );
 }
 
 function gwp_social_networks($options = false) {

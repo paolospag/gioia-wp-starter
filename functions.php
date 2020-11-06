@@ -7,6 +7,8 @@
  * @package %DOMAIN_NAME%
  */
 
+%GUTENBERG_DEFINE%
+
 /**
  * Load utilities before theme setup.
  */
@@ -30,6 +32,8 @@ if ( !function_exists('%DOMAIN_NAME%_setup') ):
 
     // Adding support for excerpt in page.
     add_post_type_support('page', 'excerpt');
+
+    %GUTENBERG_SUPPORT%
 
     // Register theme nav menus.
     register_nav_menus( array(
@@ -168,6 +172,8 @@ function %DOMAIN_NAME%_scripts() {
   }
 }
 add_action('wp_enqueue_scripts', '%DOMAIN_NAME%_scripts');
+
+%GUTENBERG_ASSETS%
 
 /**
  * Add theme color meta tag.
