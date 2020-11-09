@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 ?>
 
-<div class="posts-list__item col-md-6" role="listitem">
+<div class="posts-list__item col-md-4" role="listitem">
   <div class="entry">
     <figure class="entry__thumb">
       <a href="<?= esc_url(get_permalink()); ?>">

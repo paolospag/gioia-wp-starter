@@ -13,12 +13,10 @@ $copyright_text = get_theme_mod('copyright_text', '&copy; GWP Theme');
 
   </main><!-- #main-content -->
   <footer id="footer">
-    <?php
-      /**
-       * Footer content here.
-       */
-    ?>
-    <div class="text-center">
+    <div class="footer__top">
+      <!-- Footer top content here. -->
+    </div>
+    <div class="footer__bottom">
       <p><?php echo nl2br($copyright_text); ?></p>
     </div>
   </footer>
