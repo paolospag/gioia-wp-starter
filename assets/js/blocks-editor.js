@@ -5,11 +5,9 @@ function handleBlocksOutput(element, blockType, attributes) {
     element.props.children.props.className = `btn btn-primary ${childrenElem.props.className}`;
   }
   if (blockType.name === 'core/paragraph') {
-    // element.props.tagName = 'div';
     element.props.className = element.props.className
-      ? `wp-block-text ${element.props.className}`
-      : 'wp-block-text';
-    // element.props.value = `<p>${element.props.value}</p>`;
+      ? element.props.className
+      : null;
   }
   if (blockType.name === 'core/heading') {
     element.props.className = element.props.className

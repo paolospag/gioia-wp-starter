@@ -30,7 +30,6 @@ function isInViewport(node) {
       $('.navbar__nav > li.menu-item-has-children > a').on('mouseenter', function() {
         $(this).parent().addClass('active');
       });
-
       $('.navbar__nav > li.menu-item-has-children').on('mouseleave', function() {
         if ($(this).hasClass('active')) {
           $(this).removeClass('active');
