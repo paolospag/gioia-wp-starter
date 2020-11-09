@@ -180,7 +180,7 @@ function %DOMAIN_NAME%_customize_partial_colors() {
 
 // Render the footer copyright for the selective refresh partial.
 function %DOMAIN_NAME%_customize_partial_copyright() {
-  $copyright_text = get_theme_mod('copyright_text', '&copy; GWP Theme');
+  $copyright_text = get_theme_mod('copyright_text', '');
   echo nl2br($copyright_text);
 }
 

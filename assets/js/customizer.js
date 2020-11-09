@@ -34,10 +34,11 @@
 
   // Handle theme color scheme changes
   $.each(%DOMAIN_NAME%_color_scheme, function(i, name) {
-    wp.customize(name+'_color', function(value) {
-      value.bind(function(to, from) {
-        var rootStyle = $('[id="%DOMAIN_NAME%-theme-inline-css"]').text();
-        $('[id="%DOMAIN_NAME%-theme-inline-css"]').text( rootStyle.replace(from, to) );
+    var option = name+'_color';
+    var prop = '--'+option.replace(/_/g, '-');
+    wp.customize(option, function(value) {
+      value.bind(function(to) {
+        document.documentElement.style.setProperty(prop, to);
       });
     });
   });
