@@ -10,7 +10,7 @@ if ( !defined('ABSPATH') ) {
  * @link https://github.com/woocommerce/woocommerce/wiki/Enabling-product-gallery-features-(zoom,-swipe,-lightbox)
  */
 function %DOMAIN_NAME%_woocommerce_setup() {
-	// add_theme_support('woocommerce');
+	add_theme_support('woocommerce');
 	// add_theme_support('wc-product-gallery-zoom');
 	// add_theme_support('wc-product-gallery-lightbox');
 	// add_theme_support('wc-product-gallery-slider');
@@ -21,7 +21,7 @@ add_action('after_setup_theme', '%DOMAIN_NAME%_woocommerce_setup');
  * Enqueue WooCommerce scripts & styles.
  */
 function %DOMAIN_NAME%_woocommerce_scripts() {
-	wp_enqueue_style( '%DOMAIN_NAME%-woocommerce-style', get_template_directory_uri() .'/woocommerce.css' );
+	wp_enqueue_style( '%DOMAIN_NAME%-woocommerce-style', get_template_directory_uri() .'/assets/css/woocommerce.css' );
 	$font_path = WC()->plugin_url() .'/assets/fonts/';
 	$inline_font = '@font-face {
 		font-family: "star";
