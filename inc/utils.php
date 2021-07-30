@@ -6,12 +6,18 @@ if ( !defined('ABSPATH') ) {
 /**
  * %THEME_NAME% Theme utils.
  *
+ * @var GWP_DARK_BRIGHTNESS
+ * @var GWP_LIGHT_BRIGHTNESS
  * @package %DOMAIN_NAME%
  */
-
 define('GWP_DARK_BRIGHTNESS', -0.133);
 define('GWP_LIGHT_BRIGHTNESS', 0.296);
 
+/**
+ * Create inline style for theme admin/bar styles.
+ *
+ * @return string $admin_styles [HTML output].
+ */
 function gwp_create_admin_styles() {
   $admin_styles = 'html {
     margin-bottom: 32px !important;
@@ -41,6 +47,69 @@ function gwp_create_admin_styles() {
   return $admin_styles;
 }
 
+/**
+ * Create inline style for theme admin/login styles.
+ *
+ * @return string $login_styles [HTML output].
+ */
+function gwp_create_login_styles($logo_id) {
+  $color_scheme = gwp_color_scheme();
+  $bg_color = $color_scheme['light']['color'];
+  $btn_color = $color_scheme['text_alt']['color'];
+  $btn_light_color = gwp_color_brightness($btn_color, GWP_LIGHT_BRIGHTNESS);
+  $login_styles = "body {
+    background: $bg_color;
+  }
+  .wp-core-ui .button {
+    background: $btn_color;
+    border-color: $btn_color;
+  }
+  .wp-core-ui .button-primary.focus,
+  .wp-core-ui .button-primary.hover,
+  .wp-core-ui .button-primary:focus,
+  .wp-core-ui .button-primary:hover {
+    background: $btn_light_color;
+    border-color: $btn_light_color;
+  }
+  .wp-core-ui .button-primary.focus,
+  .wp-core-ui .button-primary:focus {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px $btn_light_color;
+  }
+  .wp-core-ui .button-secondary {
+    color: $btn_color;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  .wp-core-ui .button-secondary:hover,
+  .wp-core-ui .button-secondary:focus {
+    color: $btn_light_color;
+  }
+  input[type=checkbox]:focus, input[type=color]:focus, input[type=date]:focus, input[type=datetime-local]:focus, input[type=datetime]:focus, input[type=email]:focus, input[type=month]:focus, input[type=number]:focus, input[type=password]:focus, input[type=radio]:focus, input[type=search]:focus, input[type=tel]:focus, input[type=text]:focus, input[type=time]:focus, input[type=url]:focus, input[type=week]:focus, select:focus, textarea:focus {
+    border-color: $btn_light_color;
+    box-shadow: 0 0 0 1px $btn_light_color;
+  }
+  input[type=checkbox]:checked::before {
+    content: url('data:image/svg+xml;base64,". base64_encode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z" fill="'.$btn_color.'" /></svg>') ."');
+  }";
+  if ($logo_id) {
+    $logo_url = wp_get_attachment_url($logo_id);
+    $logo_path = wp_get_original_image_path($logo_id);
+    list($width, $height) = getimagesize($logo_path);
+    $login_styles .= "#login h1 a, .login h1 a {
+      background-image: url('$logo_url');
+      width: ${width}px;
+      height: ${height}px;
+      background-size: ${width}px ${height}px;
+    }";
+  }
+  return $login_styles;
+}
+
+/**
+ * Create inline style for theme root.
+ *
+ * @return string $root_styles [HTML output].
+ */
 function gwp_create_root_styles() {
   $color_scheme = gwp_color_scheme();
   $root_styles = ':root {';
@@ -49,7 +118,7 @@ function gwp_create_root_styles() {
     $slug_color = str_replace('_', '-', $name);
     $hex_color = get_theme_mod($option_name, $value['color']);
     $root_styles .= '--'.$slug_color.'-color: '.$hex_color.';';
-    if ( in_array($name, ['primary', 'secondary']) ) {
+    if ( in_array($name, ['primary', 'secondary', 'alt']) ) {
       $root_styles .= '--'.$slug_color.'-dark-color: '.gwp_color_brightness($hex_color, GWP_DARK_BRIGHTNESS).';';
       $root_styles .= '--'.$slug_color.'-light-color: '.gwp_color_brightness($hex_color, GWP_LIGHT_BRIGHTNESS).';';
     }
@@ -58,9 +127,34 @@ function gwp_create_root_styles() {
   return $root_styles;
 }
 
-function gwp_placeholder_thumbnail($type = 'post') {
-  $placeholder_src = get_template_directory_uri() .'/assets/img/'.$type.'-placeholder.jpg';
-  echo '<img src="'. esc_url($placeholder_src) .'" alt="'. esc_attr__('Immagine segnaposto', '%DOMAIN_NAME%') .'" />';
+/**
+ * Create inline style for theme font-sizes & colors.
+ *
+ * @return string $base_styles [HTML output].
+ */
+function gwp_create_base_styles() {
+  $color_scheme = gwp_color_scheme();
+  $font_sizes = gwp_create_block_font_sizes();
+  $base_styles = '';
+  $not_text_colors = array();
+  foreach($font_sizes as $font_size) {
+    $base_styles .= ".has-$font_size[slug]-font-size {font-size: $font_size[size]px}\n";
+  }
+  foreach($color_scheme as $name => $value) {
+    $slug = str_replace('_', '-', $name);
+    if ($name !== 'text') {
+      $not_text_colors[] = ":not(.has-$slug-color)";
+      $base_styles .= "\n.has-$slug-color {color: var(--$slug-color) !important}";
+    }
+    $base_styles .= "\n.has-$slug-background-color {background-color: var(--$slug-color) !important}";
+    if ( in_array($name, ['primary', 'secondary', 'alt']) ) {
+      $base_styles .= "\n.has-$slug-light-color {color: var(--$slug-light-color) !important}";
+      $base_styles .= "\n.has-$slug-light-background-color {background-color: var(--$slug-light-color) !important}";
+    }
+  }
+  $not_text_colors = implode('', $not_text_colors);
+  $base_styles .= "\n.has-text-color$not_text_colors {color: var(--text-color)}";
+  return $base_styles;
 }
 
 function gwp_color_scheme() {
@@ -73,6 +167,10 @@ function gwp_color_scheme() {
       'color' => '#2f2c60',
       'label' => 'Secondario'
     ],
+    'alt' => [
+      'color' => '#ecf3f9',
+      'label' => 'Alternativo'
+    ],
     'light' => [
       'color' => '#f2f2f2',
       'label' => 'Chiaro'
@@ -84,6 +182,10 @@ function gwp_color_scheme() {
     'text' => [
       'color' => '#212121',
       'label' => 'Testo'
+    ],
+    'text_alt' => [
+      'color' => '#363636',
+      'label' => 'Testo alternativo'
     ],
     'text_light' => [
       'color' => '#5f717f',
@@ -119,7 +221,7 @@ function gwp_create_block_color_palettes() {
     $option_name = $name.'_color';
     $slug_color = str_replace('_', '-', $name);
     $hex_color = get_theme_mod($option_name, $value['color']);
-    if ( in_array($name, ['primary', 'secondary']) ) {
+    if ( in_array($name, ['primary', 'secondary', 'alt']) ) {
       $light_hex_color = gwp_color_brightness($hex_color, GWP_LIGHT_BRIGHTNESS);
       $color_palettes[] = array(
         'color' => $light_hex_color,
@@ -154,7 +256,7 @@ function gwp_create_block_font_sizes() {
       'name' => __('Grande', '%DOMAIN_NAME%'),
     ],
     [
-      'size' => 36,
+      'size' => 34,
       'slug' => 'extra',
       'name' => __('Extra', '%DOMAIN_NAME%'),
     ],
@@ -163,21 +265,29 @@ function gwp_create_block_font_sizes() {
 
 function gwp_social_networks($options = false) {
   $social_networks = array(
-    'facebook' => 'Facebook',
+    'facebook'  => 'Facebook',
     'instagram' => 'Instagram',
-    'twitter' => 'Twitter',
-    'linkedin' => 'LinkedIn',
-    'youtube' => 'YouTube',
+    'linkedin'  => 'LinkedIn',
+    'twitter'   => 'Twitter',
+    'youtube'   => 'YouTube',
   );
   if ($options) {
     foreach($social_networks as $key => $name) {
       if ( $social_url = get_theme_mod($key, false) )
-        $social_networks[$key] = $social_url;
+        $social_networks[$key] = array(
+          'url'  => $social_url,
+          'name' => $name
+        );
       else
         unset($social_networks[$key]);
     }
   }
   return $social_networks;
+}
+
+function gwp_placeholder_thumbnail($type = 'post') {
+  $placeholder_src = get_template_directory_uri() .'/assets/img/post-placeholder.jpg';
+  echo '<img src="'. esc_url($placeholder_src) .'" width="330" height="360" alt="'. esc_attr__('Immagine segnaposto', '%DOMAIN_NAME%') .'" />';
 }
 
 function gwp_svg_icon($name) {
@@ -202,79 +312,76 @@ function gwp_svg_icon($name) {
       $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14.906 13.043c.117 0 .551.2 1.305.59.754.394 1.156.629 1.2.71.019.044.026.114.026.2 0 .297-.074.637-.226 1.02-.145.347-.461.64-.953.878-.488.235-.945.352-1.363.352-.512 0-1.36-.273-2.547-.828a7.672 7.672 0 01-2.278-1.582c-.64-.653-1.3-1.477-1.98-2.477-.645-.957-.961-1.82-.953-2.597v-.11c.027-.812.36-1.515.992-2.113.215-.2.445-.297.695-.297.055 0 .137.008.242.02.11.015.192.023.254.023.172 0 .29.027.356.086s.136.18.207.367c.074.18.219.57.441 1.18.227.605.336.941.336 1.004 0 .187-.152.445-.46.77-.31.327-.462.534-.462.624 0 .063.02.13.067.2.3.652.758 1.261 1.363 1.835.5.473 1.176.922 2.023 1.352.11.063.207.094.297.094.133 0 .375-.215.723-.649.348-.433.578-.652.695-.652zm-2.719 7.102a8.209 8.209 0 003.262-.672 8.464 8.464 0 002.684-1.793 8.513 8.513 0 001.797-2.688 8.191 8.191 0 00.668-3.262 8.186 8.186 0 00-.668-3.257 8.513 8.513 0 00-1.797-2.688 8.464 8.464 0 00-2.684-1.793 8.142 8.142 0 00-3.261-.672 8.142 8.142 0 00-3.262.672 8.464 8.464 0 00-2.684 1.793 8.513 8.513 0 00-1.797 2.688 8.186 8.186 0 00-.668 3.257 8.19 8.19 0 001.606 4.93l-1.059 3.121 3.242-1.031a8.233 8.233 0 004.622 1.395zm0-18.512c1.368 0 2.672.27 3.918.804 1.247.536 2.32 1.254 3.22 2.157.902.902 1.62 1.976 2.155 3.222.54 1.243.805 2.551.805 3.914a9.757 9.757 0 01-.805 3.918c-.535 1.247-1.253 2.32-2.156 3.223-.898.902-1.972 1.621-3.219 2.156a9.824 9.824 0 01-3.918.805 9.925 9.925 0 01-4.886-1.262l-5.586 1.797 1.82-5.426c-.965-1.59-1.445-3.324-1.445-5.21 0-1.364.265-2.672.805-3.915.535-1.246 1.253-2.32 2.156-3.222.898-.903 1.972-1.621 3.219-2.157a9.824 9.824 0 013.918-.804zm0 0"/></svg>';
       break;
     case 'skype':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path d="M17.426 14.238a2.944 2.944 0 00-.914-2.145 4.016 4.016 0 00-.977-.655 7.749 7.749 0 00-1.105-.458 15.647 15.647 0 00-1.172-.304l-1.39-.324c-.27-.063-.466-.11-.59-.141a4.491 4.491 0 01-.47-.152 1.373 1.373 0 01-.402-.215 1.123 1.123 0 01-.222-.281.797.797 0 01-.098-.403c0-.687.64-1.031 1.926-1.031.386 0 .73.055 1.031.16.305.11.547.234.727.383.175.148.347.297.507.45.16.151.34.28.536.386.195.11.41.16.644.16.418 0 .754-.14 1.008-.426a1.48 1.48 0 00.383-1.031c0-.492-.25-.938-.75-1.332-.5-.399-1.133-.7-1.903-.906a9.47 9.47 0 00-2.437-.309c-.606 0-1.195.07-1.766.207a6.227 6.227 0 00-1.601.633 3.212 3.212 0 00-1.192 1.164c-.3.496-.449 1.07-.449 1.719 0 .547.086 1.023.254 1.43.172.406.422.742.75 1.007.332.27.687.485 1.07.653.387.164.844.308 1.383.433l1.953.485c.805.195 1.305.355 1.5.48.285.18.43.445.43.805 0 .347-.18.636-.535.863-.36.227-.828.34-1.407.34-.457 0-.863-.07-1.226-.215a2.692 2.692 0 01-.871-.516 9.883 9.883 0 01-.61-.601 3.23 3.23 0 00-.617-.516 1.326 1.326 0 00-.722-.215c-.446 0-.782.137-1.012.403-.227.27-.34.601-.34 1.004 0 .824.543 1.527 1.633 2.109 1.09.586 2.39.879 3.898.879.653 0 1.278-.082 1.875-.25a6.075 6.075 0 001.64-.715c.497-.313.892-.73 1.184-1.254a3.49 3.49 0 00.446-1.758zm4.86 2.907c0 1.418-.5 2.628-1.509 3.632-1.004 1.008-2.215 1.508-3.632 1.508a5.009 5.009 0 01-3.137-1.07A10.01 10.01 0 0112 21.43a9.27 9.27 0 01-3.664-.746 9.374 9.374 0 01-3.012-2.008 9.374 9.374 0 01-2.008-3.012A9.27 9.27 0 012.57 12c0-.652.075-1.32.215-2.008a5.009 5.009 0 01-1.07-3.137c0-1.418.5-2.628 1.508-3.632 1.004-1.008 2.215-1.508 3.632-1.508 1.165 0 2.207.355 3.137 1.07A10.01 10.01 0 0112 2.57a9.27 9.27 0 013.664.746 9.374 9.374 0 013.012 2.008 9.374 9.374 0 012.008 3.012A9.27 9.27 0 0121.43 12c0 .652-.075 1.32-.215 2.008a5.009 5.009 0 011.07 3.137zm0 0"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M17.426 14.238a2.944 2.944 0 00-.914-2.145 4.016 4.016 0 00-.977-.655 7.749 7.749 0 00-1.105-.458 15.647 15.647 0 00-1.172-.304l-1.39-.324c-.27-.063-.466-.11-.59-.141a4.491 4.491 0 01-.47-.152 1.373 1.373 0 01-.402-.215 1.123 1.123 0 01-.222-.281.797.797 0 01-.098-.403c0-.687.64-1.031 1.926-1.031.386 0 .73.055 1.031.16.305.11.547.234.727.383.175.148.347.297.507.45.16.151.34.28.536.386.195.11.41.16.644.16.418 0 .754-.14 1.008-.426a1.48 1.48 0 00.383-1.031c0-.492-.25-.938-.75-1.332-.5-.399-1.133-.7-1.903-.906a9.47 9.47 0 00-2.437-.309c-.606 0-1.195.07-1.766.207a6.227 6.227 0 00-1.601.633 3.212 3.212 0 00-1.192 1.164c-.3.496-.449 1.07-.449 1.719 0 .547.086 1.023.254 1.43.172.406.422.742.75 1.007.332.27.687.485 1.07.653.387.164.844.308 1.383.433l1.953.485c.805.195 1.305.355 1.5.48.285.18.43.445.43.805 0 .347-.18.636-.535.863-.36.227-.828.34-1.407.34-.457 0-.863-.07-1.226-.215a2.692 2.692 0 01-.871-.516 9.883 9.883 0 01-.61-.601 3.23 3.23 0 00-.617-.516 1.326 1.326 0 00-.722-.215c-.446 0-.782.137-1.012.403-.227.27-.34.601-.34 1.004 0 .824.543 1.527 1.633 2.109 1.09.586 2.39.879 3.898.879.653 0 1.278-.082 1.875-.25a6.075 6.075 0 001.64-.715c.497-.313.892-.73 1.184-1.254a3.49 3.49 0 00.446-1.758zm4.86 2.907c0 1.418-.5 2.628-1.509 3.632-1.004 1.008-2.215 1.508-3.632 1.508a5.009 5.009 0 01-3.137-1.07A10.01 10.01 0 0112 21.43a9.27 9.27 0 01-3.664-.746 9.374 9.374 0 01-3.012-2.008 9.374 9.374 0 01-2.008-3.012A9.27 9.27 0 012.57 12c0-.652.075-1.32.215-2.008a5.009 5.009 0 01-1.07-3.137c0-1.418.5-2.628 1.508-3.632 1.004-1.008 2.215-1.508 3.632-1.508 1.165 0 2.207.355 3.137 1.07A10.01 10.01 0 0112 2.57a9.27 9.27 0 013.664.746 9.374 9.374 0 013.012 2.008 9.374 9.374 0 012.008 3.012A9.27 9.27 0 0121.43 12c0 .652-.075 1.32-.215 2.008a5.009 5.009 0 011.07 3.137zm0 0"/></svg>';
       break;
     case 'refresh':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'search':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
       break;
     case 'calendar':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>';
       break;
     case 'phone':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
       break;
     case 'phone-call':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM19 12h2c0-4.97-4.03-9-9-9v2c3.87 0 7 3.13 7 7zm-4 0h2c0-2.76-2.24-5-5-5v2c1.66 0 3 1.34 3 3z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM19 12h2c0-4.97-4.03-9-9-9v2c3.87 0 7 3.13 7 7zm-4 0h2c0-2.76-2.24-5-5-5v2c1.66 0 3 1.34 3 3z"/></svg>';
       break;
     case 'email':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'address':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none"/><path d="M8.17 5.7L1 10.48V21h5v-8h4v8h5V10.25z"/><path d="M17 7h2v2h-2z" fill="none"/><path d="M10 3v1.51l2 1.33L13.73 7H15v.85l2 1.34V11h2v2h-2v2h2v2h-2v4h6V3H10zm9 6h-2V7h2v2z"/></svg>';
-      break;
-    case 'assignment':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M8.17 5.7L1 10.48V21h5v-8h4v8h5V10.25z"/><path d="M17 7h2v2h-2z" fill="none"/><path d="M10 3v1.51l2 1.33L13.73 7H15v.85l2 1.34V11h2v2h-2v2h2v2h-2v4h6V3H10zm9 6h-2V7h2v2z"/></svg>';
       break;
     case 'place':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'globe':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>';
       break;
     case 'secure':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 1H5c-1.1 0-1.99.9-1.99 2L3 15.93c0 .69.35 1.3.88 1.66L12 23l8.11-5.41c.53-.36.88-.97.88-1.66L21 3c0-1.1-.9-2-2-2zm-9 15l-5-5 1.41-1.41L10 13.17l7.59-7.59L19 7l-9 9z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 1H5c-1.1 0-1.99.9-1.99 2L3 15.93c0 .69.35 1.3.88 1.66L12 23l8.11-5.41c.53-.36.88-.97.88-1.66L21 3c0-1.1-.9-2-2-2zm-9 15l-5-5 1.41-1.41L10 13.17l7.59-7.59L19 7l-9 9z"/></svg>';
       break;
     case 'account':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
       break;
     case 'download':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>';
       break;
     case 'dismiss':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'clock':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M0 0h24v24H0z" fill="none"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M0 0h24v24H0z" fill="none"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>';
       break;
     case 'tag':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>';
       break;
     case 'lock':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>';
       break;
     case 'lock-o':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>';
       break;
     case 'cart':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'plus':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'up':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg>';
       break;
     case 'left':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'right':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
       break;
     case 'down':
-      $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>';
+      $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>';
       break;
     default:
       $svg = '';

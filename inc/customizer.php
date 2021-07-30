@@ -94,12 +94,12 @@ function %DOMAIN_NAME%_customize_register($wp_customize) {
       ) );
     }
   }
-  $wp_customize->add_setting( 'gtag_ua_code', array(
+  $wp_customize->add_setting( 'ganalytics_code', array(
     'default'   => '',
     'transport' => 'refresh',
     'sanitize_callback' => 'wp_filter_nohtml_kses'
   ) );
-  $wp_customize->add_control( 'gtag_ua_code', array(
+  $wp_customize->add_control( 'ganalytics_code', array(
     'type'    => 'text',
     'section' => 'additional_settings',
     'label'   => __('Codice UA Analytics', '%DOMAIN_NAME%'),

@@ -10,6 +10,4 @@ The documentation for this project is work-in-progress.
 3) %THEME_URI% -> Your Theme's home URL
 4) %GOOGLE_FONTS% -> URL from Google Fonts
 5) %CSS_FONT_FAMILY% -> Font family for CSS
-6) %GUTENBERG_DEFINE% -> Define Theme support for Block Editor
-7) %GUTENBERG_SUPPORT% -> Declare Theme support for Block Editor
-8) %GUTENBERG_ASSETS% -> Enqueue Block Editor assets
+6) %ENABLE_GUTENBERG% -> Theme's support for Block Editor
